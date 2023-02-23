@@ -133,14 +133,7 @@ const checkViewConsistency = (cn, isSearchAlias, isMaterialize) => {
     } else {
       result = runQuery("FOR d IN " + vn + " OPTIONS {waitForSync: true} COLLECT WITH COUNT INTO length RETURN length")[0];
     }
-    if (expected !== result) {
-      if (expected + 1 !== result) {
-        assertEqual(expected, result);
-      } else {
-        // TODO(MBkkt) Fix it
-        print("ArangoSearch inconsistent with RocksDB");
-      }
-    }
+    assertEqual(expected, result);
   };
 
   vn = viewName(cn + "_view", isSearchAlias);
@@ -231,10 +224,12 @@ function BaseChaosSuite(testOpts) {
         indexes: [{collection: cn, index: i.name}]
       });
     } else {
-      db._createView(vn, "arangosearch", {
+      let v = db._createView(vn, "arangosearch", {
         links: {[cn]: {includeAllFields: true}},
         primarySort: [{field: "_id", asc: false}, {field: "_key", asc: true}],
+        writebufferSizeMax: 1024,
       });
+      print(v.properties());
     }
 
     vn = viewName(cn + "_view_sv", isSearchAlias);
