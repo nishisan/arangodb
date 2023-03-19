@@ -593,7 +593,6 @@ irs::filter::prepared::ptr prepareInterval(
   S2RegionTermIndexer indexer(options.options);
   S2RegionCoverer coverer(options.options);
 
-  minBound = minBound.Complement();
   TRI_ASSERT(!minBound.is_empty());
   TRI_ASSERT(!maxBound.is_empty());
   auto const ring = coverer.GetCovering(maxBound).Difference(
