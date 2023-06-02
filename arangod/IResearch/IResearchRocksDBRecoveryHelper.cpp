@@ -130,6 +130,10 @@ void IResearchRocksDBRecoveryHelper::PutCF(uint32_t column_family_id,
   auto coll =
       lookupCollection(*_dbFeature, *_engine, RocksDBKey::objectId(key));
 
+  std::map<std::shared_ptr<LogicalCollection>, range_links, range_indexes>
+  std::vector<std::shared_ptr<IResearchRocksDBLink>> range_links;
+  std::vector<std::shared_ptr<IResearchRocksDBLink>> range_indexes;
+
   if (coll == nullptr) {
     return;
   }
