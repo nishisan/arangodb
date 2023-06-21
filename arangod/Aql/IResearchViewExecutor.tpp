@@ -424,7 +424,8 @@ void IndexReadBuffer<ValueType, copySorted>::pushSortedValue(
       ++bufferIt;
     }
     std::push_heap(_rows.begin(), _rows.end(), sortContext);
-    TRI_ASSERT(threshold <= _scoreBuffer[_rows.front() * _numScoreRegisters]);
+    TRI_ASSERT(scores.empty() ||
+               threshold <= _scoreBuffer[_rows.front() * _numScoreRegisters]);
     threshold = _scoreBuffer[_rows.front() * _numScoreRegisters];
     score.Min(threshold);
   } else {
@@ -1164,7 +1165,7 @@ bool IResearchViewHeapSortExecutor<ExecutionTraits>::fillBufferInternal(
       TRI_ASSERT(doc);
       if constexpr (ExecutionTraits::Ordered) {
         auto* score = irs::get_mutable<irs::score>(itr.get());
-        if (!score) {
+        if (score != nullptr) {
           scr = score;
           numScores = scores.size();
           scr->Min(threshold);
