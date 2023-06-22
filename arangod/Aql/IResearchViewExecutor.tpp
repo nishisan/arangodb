@@ -163,6 +163,12 @@ class BufferHeapSortContext {
     return false;
   }
 
+#ifdef ARANGODB_ENABLE_MAINTAINER_MODE
+  bool desc() const noexcept {
+    return !_scoresSort.empty() && !_scoresSort.front().second;
+  }
+#endif
+
  private:
   size_t _numScoreRegisters;
   std::span<std::pair<size_t, bool> const> _scoresSort;
@@ -424,8 +430,10 @@ void IndexReadBuffer<ValueType, copySorted>::pushSortedValue(
       ++bufferIt;
     }
     std::push_heap(_rows.begin(), _rows.end(), sortContext);
-    TRI_ASSERT(scores.empty() ||
+#ifdef ARANGODB_ENABLE_MAINTAINER_MODE
+    TRI_ASSERT(!sortContext.desc() ||
                threshold <= _scoreBuffer[_rows.front() * _numScoreRegisters]);
+#endif
     threshold = _scoreBuffer[_rows.front() * _numScoreRegisters];
     score.Min(threshold);
   } else {
