@@ -20,36 +20,37 @@
 ///
 /// @author Manuel Pöter
 ////////////////////////////////////////////////////////////////////////////////
-#pragma once
 
-#include "Replication2/ReplicatedLog/LogCommon.h"
+#include "LogFileReaderImpl.h"
 
-namespace arangodb::replication2::storage {
+#include "Basics/Exceptions.h"
 
-struct IteratorPosition {
-  IteratorPosition() = default;
+namespace arangodb::replication2::storage::wal {
 
-  static IteratorPosition fromLogIndex(LogIndex index) {
-    return IteratorPosition(index);
+LogFileReaderImpl::LogFileReaderImpl(std::string const& path) {
+  _file = std::fopen(path.c_str(), "rb");
+  if (_file == nullptr) {
+    THROW_ARANGO_EXCEPTION_MESSAGE(TRI_ERROR_INTERNAL,
+                                   "failed to open replicated log file");
   }
+}
 
-  static IteratorPosition withFileOffset(LogIndex index,
-                                         std::uint64_t fileOffset) {
-    return IteratorPosition(index, fileOffset);
+LogFileReaderImpl::~LogFileReaderImpl() {
+  if (_file) {
+    std::fclose(_file);
   }
+}
 
-  [[nodiscard]] auto index() const noexcept -> LogIndex { return _logIndex; }
+auto LogFileReaderImpl::read(void* buffer, std::size_t n) -> bool {
+  return std::fread(buffer, 1, n, _file) == n;
+}
 
-  [[nodiscard]] auto fileOffset() const noexcept -> std::uint64_t {
-    return _fileOffset;
-  }
+void LogFileReaderImpl::seek(std::uint64_t pos) {
+  std::fseek(_file, pos, SEEK_SET);
+}
 
- private:
-  explicit IteratorPosition(LogIndex index) : _logIndex(index) {}
-  IteratorPosition(LogIndex index, std::uint64_t fileOffset)
-      : _logIndex(index), _fileOffset(fileOffset) {}
-  LogIndex _logIndex{0};
-  std::uint64_t _fileOffset{0};
-};
+auto LogFileReaderImpl::position() const -> std::uint64_t {
+  return std::ftell(_file);
+}
 
-}  // namespace arangodb::replication2::storage
+}  // namespace arangodb::replication2::storage::wal

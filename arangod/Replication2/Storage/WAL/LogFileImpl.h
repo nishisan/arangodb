@@ -20,36 +20,29 @@
 ///
 /// @author Manuel Pöter
 ////////////////////////////////////////////////////////////////////////////////
+
 #pragma once
 
-#include "Replication2/ReplicatedLog/LogCommon.h"
+#include "Replication2/Storage/WAL/ILogFile.h"
 
-namespace arangodb::replication2::storage {
+#include <cstdio>
+#include <string_view>
 
-struct IteratorPosition {
-  IteratorPosition() = default;
+namespace arangodb::replication2::storage::wal {
 
-  static IteratorPosition fromLogIndex(LogIndex index) {
-    return IteratorPosition(index);
-  }
+struct LogFileImpl final : ILogFile {
+  LogFileImpl(std::string path);
+  ~LogFileImpl();
 
-  static IteratorPosition withFileOffset(LogIndex index,
-                                         std::uint64_t fileOffset) {
-    return IteratorPosition(index, fileOffset);
-  }
+  auto append(std::string_view data) -> Result override;
 
-  [[nodiscard]] auto index() const noexcept -> LogIndex { return _logIndex; }
+  void sync() override;
 
-  [[nodiscard]] auto fileOffset() const noexcept -> std::uint64_t {
-    return _fileOffset;
-  }
+  auto getReader() const -> std::unique_ptr<IFileReader> override;
 
  private:
-  explicit IteratorPosition(LogIndex index) : _logIndex(index) {}
-  IteratorPosition(LogIndex index, std::uint64_t fileOffset)
-      : _logIndex(index), _fileOffset(fileOffset) {}
-  LogIndex _logIndex{0};
-  std::uint64_t _fileOffset{0};
+  std::string _path;
+  FILE* _file = nullptr;
 };
 
-}  // namespace arangodb::replication2::storage
+}  // namespace arangodb::replication2::storage::wal
