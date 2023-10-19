@@ -8,6 +8,7 @@ RUN echo "deb-src http://http.debian.net/debian testing main contrib" >> /etc/ap
 
 # Adiciona a chave GPG
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 0E98404D386FA1D9 6ED0E7B82643E131
+RUN apt update -y 
 
 RUN apt install git-core \
     build-essential \
