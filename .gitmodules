@@ -1,12 +1,12 @@
 [submodule "iresearch"]
 	path = 3rdParty/iresearch
-	url = https://github.com/iresearch-toolkit/iresearch.git
+	url = https://github.com/nishisan/iresearch.git
 [submodule "velocypack"]
 	path = 3rdParty/velocypack
 	url = https://github.com/nishisan/velocypack.git
 [submodule "3rdParty/fmt"]
 	path = 3rdParty/fmt
-	url = https://github.com/fmtlib/fmt
+	url  = https://github.com/nishisan/fmt.git
 [submodule "3rdParty/rocksdb"]
 	path = 3rdParty/rocksdb
 	url = https://github.com/nishisan/rocksdb.git
