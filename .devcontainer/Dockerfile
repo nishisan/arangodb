@@ -3,7 +3,7 @@ ARG VARIANT=ubuntu-22.04
 FROM mcr.microsoft.com/devcontainers/base:${VARIANT}
 USER root
 
-ARG ARCH "x86_64"
+ARG ARCH "x86_64" 
 ENV COMPILER_VERSION 12
 ENV CLANG_VERSION 16
 RUN apt-get update --fix-missing && \
