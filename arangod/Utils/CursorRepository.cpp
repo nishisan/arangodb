@@ -229,7 +229,7 @@ bool CursorRepository::remove(CursorId id) {
 /// it must be returned later using release()
 ////////////////////////////////////////////////////////////////////////////////
 
-Cursor* CursorRepository::find(CursorId id, bool& busy) {
+Cursor* CursorRepository::find(CursorId id, bool& busy,bool& deleted) {
   arangodb::Cursor* cursor = nullptr;
   busy = false;
 
@@ -246,6 +246,7 @@ Cursor* CursorRepository::find(CursorId id, bool& busy) {
 
     if (cursor->isDeleted()) {
       // already deleted
+      deleted = true;
       return nullptr;
     }
 
@@ -256,6 +257,7 @@ Cursor* CursorRepository::find(CursorId id, bool& busy) {
 
     if (cursor->expires() < TRI_microtime()) {
       // cursor has expired already
+      deleted = false;
       return nullptr;
     }
 

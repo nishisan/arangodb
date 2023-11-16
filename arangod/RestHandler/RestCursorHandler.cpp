@@ -759,12 +759,17 @@ void RestCursorHandler::lookupCursor(std::string_view id,
   auto cursorId =
       static_cast<arangodb::CursorId>(basics::StringUtils::uint64(id));
   bool busy;
-  _cursor = cursors->find(cursorId, busy);
+  bool deleted;
+  
+  _cursor = cursors->find(cursorId, busy,deleted);
 
   if (_cursor == nullptr) {
     if (busy) {
       generateError(GeneralResponse::responseCode(TRI_ERROR_CURSOR_BUSY),
                     TRI_ERROR_CURSOR_BUSY);
+    } else if (deleted){
+      generateError(GeneralResponse::responseCode(TRI_ERROR_CURSOR_DELETED),
+                    TRI_ERROR_CURSOR_DELETED);
     } else {
       generateError(GeneralResponse::responseCode(TRI_ERROR_CURSOR_NOT_FOUND),
                     TRI_ERROR_CURSOR_NOT_FOUND);
