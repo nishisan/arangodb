@@ -759,6 +759,9 @@ void RestCursorHandler::lookupCursor(std::string_view id,
   auto cursorId =
       static_cast<arangodb::CursorId>(basics::StringUtils::uint64(id));
   bool busy;
+  /**
+   * Tell if the cursor was removed explicit or by ttl 
+   */
   bool deleted;
   
   _cursor = cursors->find(cursorId, busy,deleted);
