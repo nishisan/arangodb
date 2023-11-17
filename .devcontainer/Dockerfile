@@ -26,9 +26,9 @@ RUN mv /tmp/sccache-v0.3.1-x86_64-unknown-linux-musl/sccache /usr/bin/sccache \
 
 # Limpar arquivos desnecessários
 RUN rm -rf /tmp/sccache.tar.gz /tmp/sccache-v0.3.1-x86_64-unknown-linux-musl
-RUN chmod +xw /tools/*.sh
-COPY ./tools/* /tools/
 
+COPY ./tools/* /tools/
+RUN chmod +xw /tools/*.sh
 RUN [ "/tools/install.sh", "3.1", "3" ]
 COPY ./scripts /scripts
 RUN export LC_ALL="C" && wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add - && add-apt-repository -s "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-${CLANG_VERSION} main" && apt install -y clang-${CLANG_VERSION} lldb-${CLANG_VERSION} lld-${CLANG_VERSION} libc++-${CLANG_VERSION}-dev libc++abi-${CLANG_VERSION}-dev libclang-common-${CLANG_VERSION}-dev libclang-rt-${CLANG_VERSION}-dev
