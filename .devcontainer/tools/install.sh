@@ -44,7 +44,7 @@ cd openldap-$OPENLDAPVERSION
 CPPFLAGS=-I/opt/openssl-$OPENSSLPATH/include \
 LDFLAGS=-L/opt/openssl-$OPENSSLPATH/lib64 \
 ./configure -prefix=/opt/openssl-$OPENSSLPATH --enable-static
-make depend && make -j64
+make depend && make -j16
 make install
 cd /tmp
 rm -rf openldap-$OPENLDAPVERSION.tgz openldap-$OPENLDAPVERSION
