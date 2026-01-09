@@ -154,15 +154,13 @@ bool RefactoredTraverserCache::appendEdge(EdgeDocumentToken const& idToken,
     // counted it in the edge Index before copying...
     if constexpr (std::is_same_v<ResultType, aql::AqlValue>) {
       if (!_edgeProjections.empty()) {
-        // TODO: This does one unnecessary copy.
-        // We should be able to move the Projection into the
-        // AQL value.
-        transaction::BuilderLeaser builder(_trx);
+        velocypack::Buffer<uint8_t> buffer;
+        velocypack::Builder builder(buffer);
         {
-          VPackObjectBuilder guard(builder.get());
-          _edgeProjections.toVelocyPackFromDocument(*builder, edge, _trx);
+          VPackObjectBuilder guard(&builder);
+          _edgeProjections.toVelocyPackFromDocument(builder, edge, _trx);
         }
-        result = aql::AqlValue(builder->slice());
+        result = aql::AqlValue(std::move(buffer));
       } else if (data) {
         result = aql::AqlValue(data);
       } else {
@@ -232,15 +230,13 @@ bool RefactoredTraverserCache::appendVertex(
         // copying...
         if constexpr (std::is_same_v<ResultType, aql::AqlValue>) {
           if (!_vertexProjections.empty()) {
-            // TODO: This does one unnecessary copy.
-            // We should be able to move the Projection into the
-            // AQL value.
-            transaction::BuilderLeaser builder(_trx);
+            velocypack::Buffer<uint8_t> buffer;
+            velocypack::Builder builder(buffer);
             {
-              VPackObjectBuilder guard(builder.get());
-              _vertexProjections.toVelocyPackFromDocument(*builder, doc, _trx);
+              VPackObjectBuilder guard(&builder);
+              _vertexProjections.toVelocyPackFromDocument(builder, doc, _trx);
             }
-            result = aql::AqlValue(builder->slice());
+            result = aql::AqlValue(std::move(buffer));
           } else if (data) {
             result = aql::AqlValue(data);
           } else {
